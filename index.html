@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Gusanillo - Web Responsiva</title>
+    <style>
+        /* --- 1. VARIABLES Y ESTILOS BASE --- */
+        :root {
+            --primary-color: #E63946;
+            --accent-color: #1D3557;
+            --bg-color: #F8F9FA;
+            --card-bg: #FFFFFF;
+            --text-main: #333333;
+            --text-secondary: #666666;
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+            padding-bottom: 80px; /* Espacio para el menú móvil */
+            color: var(--text-main);
+            transition: padding 0.3s;
+        }
+
+        /* --- 2. CABECERA --- */
+        header {
+            background-color: var(--card-bg);
+            padding: 10px 20px; /* Reducido un poco el padding vertical para ajustar el logo */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left { display: flex; align-items: center; gap: 20px; }
+
+        .logo {
+            cursor: pointer;
+            display: flex; 
+            align-items: center;
+            /* Quitamos estilos de fuente porque ahora es imagen */
+        }
+
+        /* NUEVO: Estilo para que tu imagen de logo se vea bien */
+        .logo img {
+            height: 50px; /* Altura controlada para que no rompa la cabecera */
+            width: auto;  /* El ancho se ajusta solo */
+            object-fit: contain;
+        }
+
+        .city-selector {
+            font-size: 0.9rem;
+            color: var(--accent-color);
+            font-weight: 600;
+            background: #eee;
+            padding: 5px 12px;
+            border-radius: 20px;
+        }
+
+        /* MENÚ DE ESCRITORIO (Oculto en móvil por defecto) */
+        .desktop-nav {
+            display: none; /* Se oculta en pantallas pequeñas */
+            gap: 20px;
+        }
+
+        .desktop-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: color 0.2s;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+
+        .desktop-link:hover, .desktop-link.active {
+            color: var(--primary-color);
+            background-color: #FFF0F1;
+        }
+
+        /* --- 3. CONTENEDORES Y GRID --- */
+        .page-section {
+            display: none;
+            padding: 20px;
+            margin: 0 auto;
+            max-width: 600px; /* Ancho por defecto móvil */
+            animation: fadeIn 0.3s ease;
+        }
+
+        .page-section.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* GRID DE PELÍCULAS (Móvil: 2 columnas) */
+        .movie-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        /* LISTA DE CINES (Móvil: Columna vertical) */
+        .cinema-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* --- 4. TARJETAS Y ELEMENTOS --- */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+
+        /* Películas */
+        .poster-placeholder {
+            width: 100%; height: 200px; background-color: #ddd;
+            display: flex; align-items: center; justify-content: center;
+            color: #888; font-size: 0.8rem;
+        }
+        .movie-info { padding: 15px; }
+        .movie-title { font-weight: bold; display: block; margin-bottom: 5px; }
+        .movie-genre { font-size: 0.8rem; color: var(--text-secondary); }
+        .btn-small {
+            background-color: var(--primary-color); color: white; border: none;
+            border-radius: 4px; padding: 6px 12px; font-size: 0.8rem;
+            margin-top: 10px; display: inline-block;
+        }
+
+        /* Cines */
+        .cinema-card-content {
+            padding: 20px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .cinema-info-flex { display: flex; align-items: center; gap: 15px; }
+        .cinema-icon {
+            background-color: #EBF2FA; color: var(--accent-color);
+            width: 50px; height: 50px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+        }
+
+        /* Detalles */
+        .detail-hero {
+            width: 100%; height: 250px; background-color: #333; color: white;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 12px; margin-bottom: 25px;
+        }
+        .time-pills { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+        .time-pill {
+            background: white; border: 1px solid var(--accent-color);
+            color: var(--accent-color); padding: 8px 16px; border-radius: 20px;
+            font-weight: bold; cursor: pointer; transition: 0.2s;
+        }
+        .time-pill:hover { background: var(--accent-color); color: white; }
+        
+        .back-btn {
+            background: none; border: none; font-size: 1rem; color: var(--text-secondary);
+            cursor: pointer; margin-bottom: 15px; display: flex; align-items: center; gap: 5px;
+        }
+
+        /* Buscador */
+        .search-bar {
+            width: 100%; padding: 15px; border-radius: 8px; border: 1px solid #ddd;
+            font-size: 1rem; margin-bottom: 25px; box-sizing: border-box;
+        }
+
+        /* --- 5. BOTTOM NAV (Solo Móvil) --- */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; width: 100%; background: var(--card-bg);
+            display: flex; justify-content: space-around; padding: 12px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05); border-top: 1px solid #eee; z-index: 200;
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center;
+            background: none; border: none; color: #999; font-size: 0.75rem; gap: 4px;
+        }
+        .nav-item.active { color: var(--primary-color); font-weight: 600; }
+        .nav-icon { font-size: 1.4rem; }
+
+
+        /* ==========================================================================
+           --- MEDIA QUERIES: AQUÍ OCURRE LA MAGIA DEL ESCRITORIO ---
+           ========================================================================== */
+        @media (min-width: 768px) {
+            
+            /* 1. Ajustes Generales de Escritorio */
+            body {
+                padding-bottom: 0; /* Quitamos espacio del menú inferior */
+                background-color: #f0f2f5; /* Fondo un poco más oscuro para contraste */
+            }
+
+            /* 2. Cabecera Desktop */
+            header {
+                padding: 15px 50px; /* Más espacio a los lados */
+                margin-bottom: 30px;
+            }
+
+            /* Aumentamos un poco el logo en escritorio */
+            .logo img { height: 60px; }
+
+            /* Mostramos menú superior y ocultamos menú inferior */
+            .desktop-nav { display: flex; }
+            .bottom-nav { display: none; }
+
+            /* 3. Contenedores más anchos */
+            .page-section {
+                max-width: 1200px; /* Aprovechamos la pantalla ancha */
+                padding: 0 50px;
+            }
+
+            /* 4. Grid de Películas (4 columnas en vez de 2) */
+            .movie-grid {
+                grid-template-columns: repeat(4, 1fr); 
+                gap: 25px;
+            }
+
+            /* 5. Lista de Cines (Grid en vez de lista vertical) */
+            .cinema-list {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr); /* 3 tarjetas por fila */
+                gap: 25px;
+            }
+
+            .cinema-card-content {
+                flex-direction: column; /* Icono arriba, texto abajo */
+                text-align: center;
+                gap: 15px;
+                padding: 30px;
+            }
+            
+            .cinema-info-flex { flex-direction: column; }
+            
+            /* Ocultamos la flecha '>' en escritorio porque ya tenemos hover */
+            .chevron-mobile { display: none; }
+
+            /* 6. Detalles */
+            .detail-hero { height: 400px; } /* Imagen más grande */
+            
+            /* Layout de detalle: Dos columnas (Info izq, Horarios der) */
+            .detail-layout-desktop {
+                display: grid;
+                grid-template-columns: 1fr 300px;
+                gap: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <div class="logo" onclick="switchTab('inicio')">
+                <img src="logo.png" alt="El Gusanillo de Valladolid">
+            </div>
+            <div class="city-selector">📍 Valladolid</div>
+        </div>
+
+        <nav class="desktop-nav">
+            <a class="desktop-link active" onclick="switchTab('inicio')" id="desk-inicio">Cartelera</a>
+            <a class="desktop-link" onclick="switchTab('cines')" id="desk-cines">Cines</a>
+            <a class="desktop-link" onclick="switchTab('buscar')" id="desk-buscar">Buscar</a>
+            <a class="desktop-link" onclick="switchTab('perfil')" id="desk-perfil">Mi Perfil</a>
+        </nav>
+    </header>
+
+    <section id="inicio" class="page-section active">
+        <h1 style="margin-bottom: 25px;">🎬 Estrenos en Cartelera</h1>
+        <div class="movie-grid">
+            <div class="card" onclick="openDetail('Top Gun: Maverick')">
+                <div class="poster-placeholder" style="background: #222;">Poster Top Gun</div>
+                <div class="movie-info">
+                    <span class="movie-title">Top Gun: Maverick</span>
+                    <span class="movie-genre">Acción • 2h 11m</span>
+                    <span class="btn-small">Ver Horarios</span>
+                </div>
+            </div>
+            <div class="card" onclick="openDetail('Doctor Strange')">
+                <div class="poster-placeholder" style="background: #4a1a1a;">Poster Strange</div>
+                <div class="movie-info">
+                    <span class="movie-title">Doctor Strange</span>
+                    <span class="movie-genre">Fantasía • 2h 6m</span>
+                    <span class="btn-small">Ver Horarios</span>
+                </div>
+            </div>
+            <div class="card" onclick="openDetail('Jurassic World')">
+                <div class="poster-placeholder" style="background: #1a3a1a;">Poster Jurassic</div>
+                <div class="movie-info">
+                    <span class="movie-title">Jurassic World</span>
+                    <span class="movie-genre">Aventura • 2h 27m</span>
+                    <span class="btn-small">Ver Horarios</span>
+                </div>
+            </div>
+            <div class="card" onclick="openDetail('Lightyear')">
+                <div class="poster-placeholder" style="background: #1a1a4a;">Poster Lightyear</div>
+                <div class="movie-info">
+                    <span class="movie-title">Lightyear</span>
+                    <span class="movie-genre">Animación • 1h 45m</span>
+                    <span class="btn-small">Ver Horarios</span>
+                </div>
+            </div>
+            <div class="card" onclick="openDetail('Elvis')">
+                <div class="poster-placeholder" style="background: #5a4a1a;">Poster Elvis</div>
+                <div class="movie-info">
+                    <span class="movie-title">Elvis</span>
+                    <span class="movie-genre">Drama • 2h 39m</span>
+                    <span class="btn-small">Ver Horarios</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="cines" class="page-section">
+        <h1 style="margin-bottom: 25px;">📍 Selecciona tu Cine</h1>
+        <div class="cinema-list">
+            <div class="card cinema-card-content" onclick="abrirDetalleCine('broadway')">
+                <div class="cinema-info-flex">
+                    <div class="cinema-icon">🍿</div>
+                    <div>
+                        <span style="display:block; font-weight:bold; font-size:1.1rem;">Cine Broadway</span>
+                        <span style="display:block; font-size:0.9rem; color:#666">Paseo Hospital Militar</span>
+                    </div>
+                </div>
+                <div class="chevron-mobile">›</div>
+            </div>
+
+            <div class="card cinema-card-content" onclick="abrirDetalleCine('manhattan')">
+                <div class="cinema-info-flex">
+                    <div class="cinema-icon">🎬</div>
+                    <div>
+                        <span style="display:block; font-weight:bold; font-size:1.1rem;">Cines Manhattan</span>
+                        <span style="display:block; font-size:0.9rem; color:#666">Calle Cervantes, 13</span>
+                    </div>
+                </div>
+                <div class="chevron-mobile">›</div>
+            </div>
+
+            <div class="card cinema-card-content" onclick="abrirDetalleCine('yelmo')">
+                <div class="cinema-info-flex">
+                    <div class="cinema-icon">⭐</div>
+                    <div>
+                        <span style="display:block; font-weight:bold; font-size:1.1rem;">Yelmo Vallsur</span>
+                        <span style="display:block; font-size:0.9rem; color:#666">Paseo de Zorrilla</span>
+                    </div>
+                </div>
+                <div class="chevron-mobile">›</div>
+            </div>
+        </div>
+    </section>
+
+    <section id="buscar" class="page-section">
+        <h1>🔍 Buscar Película</h1>
+        <input type="text" class="search-bar" placeholder="Escribe título, actor o cine...">
+        <h3>Populares hoy</h3>
+        <div class="time-pills">
+            <span class="time-pill">Acción</span>
+            <span class="time-pill">Infantil</span>
+            <span class="time-pill">Marvel</span>
+            <span class="time-pill">Terror</span>
+        </div>
+    </section>
+
+    <section id="perfil" class="page-section">
+        <div style="text-align: center; margin-bottom: 40px; padding: 40px; background: white; border-radius: 12px; box-shadow: var(--shadow);">
+            <div style="width: 100px; height: 100px; background: #eee; border-radius: 50%; margin: 0 auto 15px auto; display:flex; align-items:center; justify-content:center; font-size:3rem;">👤</div>
+            <h2>Nicolás ****</h2>
+            <p style="color: #666;">Valladolid • Socio desde 2015</p>
+        </div>
+        
+        <div class="cinema-list"> <div class="card cinema-card-content">
+                <span style="font-weight:bold">🎟️ Mis Entradas</span>
+             </div>
+             <div class="card cinema-card-content">
+                <span style="font-weight:bold">❤️ Favoritos</span>
+             </div>
+             <div class="card cinema-card-content" style="color: var(--primary-color);">
+                <span style="font-weight:bold">Cerrar Sesión</span>
+             </div>
+        </div>
+    </section>
+
+    <section id="detalle" class="page-section">
+        <button class="back-btn" onclick="switchTab('inicio')">← Volver a Cartelera</button>
+        
+        <div class="detail-layout-desktop"> <div>
+                <div class="detail-hero">
+                    <span id="detail-title-hero">Trailer / Imagen Principal</span>
+                </div>
+                <h1 id="detail-title" style="font-size: 2rem;">Título Película</h1>
+                <p style="color: #666; line-height: 1.8; margin-top: 20px;">
+                    Aquí va la sinopsis completa. Este texto está optimizado para la lectura. En la versión de escritorio, esta columna ocupa el espacio principal a la izquierda, mientras que los horarios se quedan en una barra lateral a la derecha para facilitar la compra rápida.
+                </p>
+            </div>
+
+            <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: var(--shadow); height: fit-content;">
+                <h3 style="border-bottom: 1px solid #eee; padding-bottom: 10px;">📅 Horarios Hoy</h3>
+                
+                <div style="margin-top: 20px;">
+                    <strong style="color: var(--accent-color);">Cine Broadway</strong>
+                    <div class="time-pills">
+                        <div class="time-pill">17:00</div>
+                        <div class="time-pill">19:30</div>
+                        <div class="time-pill">22:00</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <strong style="color: var(--accent-color);">Yelmo Vallsur</strong>
+                    <div class="time-pills">
+                        <div class="time-pill">18:15</div>
+                        <div class="time-pill">21:45</div>
+                    </div>
+                </div>
+                
+                <button style="width:100%; background:var(--primary-color); color:white; border:none; padding:15px; border-radius:8px; margin-top:30px; font-weight:bold; cursor:pointer;">Comprar Entradas</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="detalle-cine" class="page-section">
+        <button class="back-btn" onclick="switchTab('cines')">← Volver a Cines</button>
+        <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: var(--shadow); margin-bottom: 30px;">
+            <h1 id="cine-nombre-detalle" style="margin: 0;">Nombre Cine</h1>
+            <p id="cine-direccion-detalle" style="color: #666; margin-top: 5px;">Dirección</p>
+        </div>
+        <h3>🍿 Cartelera de este cine</h3>
+        <div id="cine-lista-peliculas" style="margin-top: 20px;"></div>
+    </section>
+
+
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="switchTab('inicio')" id="mob-inicio">
+            <span class="nav-icon">🏠</span> Inicio
+        </button>
+        <button class="nav-item" onclick="switchTab('cines')" id="mob-cines">
+            <span class="nav-icon">📍</span> Cines
+        </button>
+        <button class="nav-item" onclick="switchTab('buscar')" id="mob-buscar">
+            <span class="nav-icon">🔍</span> Buscar
+        </button>
+        <button class="nav-item" onclick="switchTab('perfil')" id="mob-perfil">
+            <span class="nav-icon">👤</span> Perfil
+        </button>
+    </nav>
+
+
+    <script>
+        const datosCines = {
+            'broadway': {
+                nombre: 'Cine Broadway',
+                direccion: 'Paseo del Hospital Militar, 34',
+                peliculas: [
+                    { titulo: 'El Buen Patrón', horarios: ['17:00', '19:45', '22:15'] },
+                    { titulo: 'Top Gun: Maverick', horarios: ['18:00', '21:00'] }
+                ]
+            },
+            'manhattan': {
+                nombre: 'Cines Manhattan',
+                direccion: 'Calle Cervantes, 13',
+                peliculas: [
+                    { titulo: 'Doctor Strange', horarios: ['17:15', '20:00', '22:30'] },
+                    { titulo: 'Cinco Lobitos', horarios: ['19:00', '21:30'] }
+                ]
+            },
+            'yelmo': {
+                nombre: 'Yelmo Premium Vallsur',
+                direccion: 'Paseo de Zorrilla, s/n',
+                peliculas: [
+                    { titulo: 'Jurassic World', horarios: ['16:00', '19:00', '22:00'] },
+                    { titulo: 'Lightyear', horarios: ['16:15', '18:15', '20:15'] }
+                ]
+            }
+        };
+
+        function switchTab(tabId) {
+            // Ocultar secciones
+            document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+
+            // Actualizar Menú Móvil
+            document.querySelectorAll('.bottom-nav .nav-item').forEach(btn => btn.classList.remove('active'));
+            const mobBtn = document.getElementById('mob-' + tabId);
+            if(mobBtn) mobBtn.classList.add('active');
+
+            // Actualizar Menú Escritorio
+            document.querySelectorAll('.desktop-nav .desktop-link').forEach(link => link.classList.remove('active'));
+            const deskBtn = document.getElementById('desk-' + tabId);
+            if(deskBtn) deskBtn.classList.add('active');
+        }
+
+        function openDetail(title) {
+            document.getElementById('detail-title').innerText = title;
+            switchTab('detalle');
+        }
+
+        function abrirDetalleCine(idCine) {
+            const cine = datosCines[idCine];
+            if (!cine) return;
+
+            document.getElementById('cine-nombre-detalle').innerText = cine.nombre;
+            document.getElementById('cine-direccion-detalle').innerText = cine.direccion;
+
+            const contenedor = document.getElementById('cine-lista-peliculas');
+            contenedor.innerHTML = '';
+
+            cine.peliculas.forEach(peli => {
+                const pills = peli.horarios.map(h => `<span class="time-pill">${h}</span>`).join('');
+                contenedor.innerHTML += `
+                    <div class="card" style="padding: 20px; margin-bottom: 15px; cursor:default;">
+                        <h4 style="margin:0 0 10px 0;">${peli.titulo}</h4>
+                        <div class="time-pills">${pills}</div>
+                    </div>`;
+            });
+            switchTab('detalle-cine');
+        }
+    </script>
+</body>
+</html>
